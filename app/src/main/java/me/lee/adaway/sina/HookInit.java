@@ -31,6 +31,7 @@ public class HookInit implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String text = "微博版本: 未安装!";
+                HookPackage.initSurportVersion();
                 if(HookUtil.isPackageInstalled(getCurrentApplication(), HookConstant.HOOK_PACKAGE_NAME)){
                     String versionName = HookUtil.getVersionName(HookConstant.HOOK_PACKAGE_NAME);
                     text = "微博版本: v" + versionName;

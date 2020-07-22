@@ -33,7 +33,12 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 ((Switch) viewTemp).setChecked(getBoolean(String.valueOf(viewTemp.getId())));
             }
         }
-        HookPackage.initSurportVersion();
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                HookPackage.initSurportVersion();
+            }
+        }).start();
     }
 
     @Override
