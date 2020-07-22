@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SinaAdAway</string>
+    <string name="btn_active">激活</string>
+    <string name="btn_ignore">忽略</string>
+    <string name="toast_xposed_not_installed">未安装 Xposed Installer！</string>
+    <string name="toast_exposed_not_installed">未安装太极！</string>
+    <string name="work_right_now">更改立即生效</string>
+    <string name="work_after_reload">更改在结束软件进程或者重启后生效</string>
+    <string name="msg_module_not_active">模块未激活，请先激活模块并重启手机！</string>
+</resources>
