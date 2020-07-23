@@ -33,12 +33,12 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 ((Switch) viewTemp).setChecked(getBoolean(String.valueOf(viewTemp.getId())));
             }
         }
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                HookPackage.initSurportVersion();
-            }
-        }).start();
+//        new Thread(new Runnable(){
+//            @Override
+//            public void run() {
+//                HookPackage.initSurportVersion();
+//            }
+//        }).start();
     }
 
     @Override
@@ -49,6 +49,8 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 changeIconStatus(!b);
                 break;
             case R.id.active_module:
+            case R.id.skip_start_activity_ad:
+            case R.id.hide_top_hongbao:
                 break;
             default:
                 if(b){

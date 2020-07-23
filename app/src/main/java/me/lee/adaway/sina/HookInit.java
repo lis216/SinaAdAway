@@ -1,8 +1,5 @@
 package me.lee.adaway.sina;
 
-import android.content.Context;
-import android.view.ContextThemeWrapper;
-import android.widget.Toast;
 import de.robv.android.xposed.*;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import me.lee.adaway.sina.constant.HookConstant;
@@ -31,7 +28,6 @@ public class HookInit implements IXposedHookLoadPackage {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String text = "微博版本: 未安装!";
-                HookPackage.initSurportVersion();
                 if(HookUtil.isPackageInstalled(getCurrentApplication(), HookConstant.HOOK_PACKAGE_NAME)){
                     String versionName = HookUtil.getVersionName(HookConstant.HOOK_PACKAGE_NAME);
                     text = "微博版本: v" + versionName;
@@ -53,10 +49,8 @@ public class HookInit implements IXposedHookLoadPackage {
             setModuleActive(lpparam.classLoader);
             setHeaderTips(lpparam.classLoader);
         }
-
-
         if (lpparam.packageName.equals(HookConstant.HOOK_PACKAGE_NAME)) {
-
+            HookPackage.getInstance().hookHandler(lpparam);
         }
     }
 

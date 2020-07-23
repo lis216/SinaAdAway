@@ -3,7 +3,10 @@ package me.lee.adaway.sina;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import me.lee.adaway.sina.constant.HookConstant;
+import me.lee.adaway.sina.hooker.AdHook;
+import me.lee.adaway.sina.hooker.HomeHook;
 import me.lee.adaway.sina.hooker.base.BaseHook;
+import me.lee.adaway.sina.hooker.info.Classes;
 import me.lee.adaway.sina.utils.HookUtil;
 import me.lee.adaway.sina.utils.HttpUtil;
 
@@ -64,11 +67,16 @@ public class HookPackage {
     }
 
     private boolean isHookSwitchOpened() {
-        return getXSharedPrefs().getBoolean("active_module", false);
+        return getXSharedPrefs().getBoolean(String.valueOf(R.id.active_module), false);
     }
 
     void hookHandler(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        if (!isHookSwitchOpened()) return;
+        if (!isHookSwitchOpened()) {
+            HookUtil.showToast("SinaAdAway未启用!");
+            return;
+        }
+        HookUtil.showToast("SinaAdAway 加载成功!");
+        Classes.initClass(lpparam.classLoader);
         versionName = HookUtil.getVersionName(HookConstant.HOOK_PACKAGE_NAME);
         versionCode = HookUtil.getVersionCode(HookConstant.HOOK_PACKAGE_NAME);
         loader = lpparam.classLoader;
@@ -77,7 +85,8 @@ public class HookPackage {
 
     private void startAllHook() {
         hooks.clear();
-        //hooks.add(new CommentListHook());
+        hooks.add(new AdHook());
+        hooks.add(new HomeHook());
         for (BaseHook hook : hooks) {
             hook.startHook();
         }

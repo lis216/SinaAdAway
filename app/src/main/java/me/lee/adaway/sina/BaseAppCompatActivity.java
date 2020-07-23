@@ -75,6 +75,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     }
 
     private void setHeaderTips(String text){
+        Log.i("Xposed Log", "setHeaderTips");
         TextView tips = findViewById(R.id.tip_0);
         tips.setText(text);
     }

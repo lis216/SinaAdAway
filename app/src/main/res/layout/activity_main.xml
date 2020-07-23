@@ -49,6 +49,10 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <Switch
+                    android:text="去除启动页广告"
+                    android:layout_width="395dp"
+                    android:layout_height="50dp" android:id="@+id/skip_start_activity_ad" android:paddingLeft="10dp"/>
+            <Switch
                     android:text="隐藏首页右上角签到红包"
                     android:layout_width="395dp"
                     android:layout_height="50dp" android:id="@+id/hide_top_hongbao" android:paddingLeft="10dp"/>
@@ -63,7 +67,7 @@
             <Switch
                     android:text="自动领取刷微博红包"
                     android:layout_width="395dp"
-                    android:layout_height="50dp" android:id="@+id/auto_hongbao" android:paddingLeft="10dp"/>
+                    android:layout_height="50dp" android:id="@+id/auto_get_hongbao" android:paddingLeft="10dp"/>
             <Switch
                     android:text="隐藏微博内容广告"
                     android:layout_width="395dp"

@@ -89,6 +89,10 @@ public final class HookUtil {
         return current.equals(context.getPackageName());
     }
 
+    public static void showToast(String message) {
+        showToast(message, false, 500L);
+    }
+
     public static void showToast(String message, boolean longTime, long delay) {
         int duration = longTime ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
         new Handler(Looper.getMainLooper()).postDelayed(() -> Toast.makeText(getCurrentApplication(), message, duration).show(), delay);

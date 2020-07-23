@@ -65,6 +65,10 @@ public class LogUtil {
         log(tag, text, 'v');
     }
 
+    public static void log(String msg) {
+        d("Xposed Log", msg);
+    }
+
     public static void log(Throwable throwable) {
         e(throwable.getClass().getSimpleName(), throwable);
     }
