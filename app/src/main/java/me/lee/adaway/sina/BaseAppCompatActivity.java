@@ -11,14 +11,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import me.lee.adaway.sina.R;
 import me.lee.adaway.sina.constant.HookConstant;
 import me.lee.adaway.sina.utils.FileUtil;
 import me.lee.adaway.sina.utils.HookUtil;
-import me.lee.adaway.sina.utils.LogUtil;
 
 import java.io.File;
 
@@ -42,6 +40,12 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         editor.commit();
     }
 
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setWorldReadable();
+    }
+
     public Boolean getBoolean(String key) {
         SharedPreferences prefs = getPrefs();
         return prefs.getBoolean(key, false);
@@ -51,7 +55,6 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkActiveState();
-        setHeaderTips("");
     }
 
     @Override
@@ -74,13 +77,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         }, 500L);
     }
 
-    private void setHeaderTips(String text){
-        Log.i("Xposed Log", "setHeaderTips");
-        TextView tips = findViewById(R.id.tip_0);
-        tips.setText(text);
-    }
-
-    private boolean isModuleActive(){
+    private boolean isModuleActive() {
         // VirtualXposed 在某些机型上hook短方法有问题，这里认为添加日志增大方法长度确保能hook成功。
         Log.i("Xposed Log", "isModuleActive");
         return false;
@@ -167,7 +164,7 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressWarnings ({"deprecation", "ResultOfMethodCallIgnored"})
+    @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     @SuppressLint({"SetWorldReadable", "WorldReadableFiles"})
     public void setWorldReadable() {
         if (getPrefsFile(this).exists()) {

@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep public class me.lee.adaway.sina.HookInit
+-keep public class me.lee.adaway.sina.BaseAppCompatActivity
+-keepclassmembers class me.lee.adaway.sina.BaseAppCompatActivity {
+    boolean isModuleActive();
+}

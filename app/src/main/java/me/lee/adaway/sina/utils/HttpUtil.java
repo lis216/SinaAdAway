@@ -8,7 +8,7 @@ import java.net.URL;
 public class HttpUtil {
 
     public static String getPageContent(String urlStr) {
-        try{
+        try {
             URL url = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
@@ -26,7 +26,7 @@ public class HttpUtil {
             }
             conn.disconnect();
             return builder.toString();
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
 

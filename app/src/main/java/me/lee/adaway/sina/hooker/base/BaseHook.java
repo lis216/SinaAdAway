@@ -1,8 +1,9 @@
 package me.lee.adaway.sina.hooker.base;
 
 import android.view.View;
+import com.alibaba.fastjson.JSONObject;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XSharedPreferences;
+import de.robv.android.xposed.XC_MethodReplacement;
 import me.lee.adaway.sina.HookPackage;
 import me.lee.adaway.sina.constant.HookConstant;
 
@@ -11,12 +12,12 @@ import java.lang.reflect.Field;
 import static de.robv.android.xposed.XposedBridge.log;
 
 public abstract class BaseHook {
-    protected XSharedPreferences prefs;
+    protected JSONObject config;
     protected ClassLoader loader;
 
     public BaseHook() {
-        this.prefs = HookPackage.getXSharedPrefs();
-        this.loader = HookPackage.loader;
+        this.loader = HookPackage.getLoader();
+        this.config = HookPackage.getConfig();
     }
 
     protected abstract void hookMain();
@@ -31,16 +32,15 @@ public abstract class BaseHook {
     }
 
     protected boolean disableHook() {
-        return HookPackage.versionName.compareTo(HookConstant.DISABLE_VERSION) < 0;
+        return HookPackage.getVersionName().compareTo(HookConstant.DISABLE_VERSION) < 0;
     }
 
-    protected final void loadPrefs() {
-        prefs = HookPackage.getXSharedPrefs();
-        prefs.reload();
-        initPrefs();
+    protected final void loadConfig() {
+        this.config = HookPackage.loadConfig();
+        initConfig();
     }
 
-    protected void initPrefs() {
+    protected void initConfig() {
     }
 
     protected <T> T getObject(Object obj, Class<?> type, String name) {
@@ -51,7 +51,7 @@ public abstract class BaseHook {
         return getObject(clazz, type, name, null);
     }
 
-    @SuppressWarnings ("unchecked")
+    @SuppressWarnings("unchecked")
     protected <T> T getObject(Class clazz, Class<?> type, String name, Object obj) {
         try {
             Field field = findField(clazz, type, name);
@@ -84,5 +84,16 @@ public abstract class BaseHook {
         }
     }
 
+    protected XC_MethodHook replaceNull() {
+        return replaceObj(null);
+    }
+
+    protected XC_MethodHook replaceFalse() {
+        return replaceObj(false);
+    }
+
+    protected XC_MethodHook replaceObj(Object result) {
+        return XC_MethodReplacement.returnConstant(result);
+    }
 
 }
