@@ -10,6 +10,8 @@ import me.lee.adaway.sina.R;
 import me.lee.adaway.sina.hooker.base.BaseHook;
 import me.lee.adaway.sina.utils.HookUtil;
 import me.lee.adaway.sina.utils.LogUtil;
+import me.lee.adaway.sina.utils.StringUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public class AdHook extends BaseHook {
     private Boolean hideDetailAd;
     private Boolean hideDetailShare;
     private Boolean hideCommentAd;
+    private Boolean hideFindPageCarousel;
+    private Boolean hideFindPageNav;
 
     @Override
     protected void initConfig() {
@@ -34,6 +38,8 @@ public class AdHook extends BaseHook {
         hideDetailShare = config.getBoolean(String.valueOf(R.id.hide_detail_share));
         hideCommentAd = config.getBoolean(String.valueOf(R.id.hide_comment_ad));
         cancelHideContentHot = config.getBoolean(String.valueOf(R.id.cancel_hide_content_hot));
+        hideFindPageCarousel = config.getBoolean(String.valueOf(R.id.hide_find_page_carousel));
+        hideFindPageNav = config.getBoolean(String.valueOf(R.id.hide_find_page_nav));
     }
 
     @Override
@@ -98,6 +104,80 @@ public class AdHook extends BaseHook {
             }
         });
         HookUtil.findAndHookMethod(className, loader, "insetTrend", replaceNull());
+
+        try {
+            Class CardList = loader.loadClass("com.sina.weibo.models.CardList");
+            // 话题头回调显示
+            //HookUtil.findAndHookMethod("com.sina.weibo.page.SearchResultActivity", loader, "netCallback", String.class, CardList, replaceNull());
+            //HookUtil.findAndHookMethod("com.sina.weibo.page.NewCardListActivity", loader, "netCallback", String.class, CardList, replaceNull());
+            // 卡片初始化  在此移除会导致空指针
+//            HookUtil.findAndHookMethod("com.sina.weibo.card.model.CardMblog", loader, "initFromJsonObject", JSONObject.class, new XC_MethodHook() {
+//                @Override
+//                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                    JSONObject json = (JSONObject) param.args[0];
+//                    JSONObject optJSONObject = json.optJSONObject("mblog");
+//                    if (shouldRemoveCardMblog(optJSONObject)) {
+//                        param.args[0] = null;
+//                        showToast("被移除");
+//                    }
+//                }
+//            });
+            // 从JSON加载卡片  入参所有的卡片数据(热门 本地 话题 以及某个话题的卡片)
+            HookUtil.findAndHookMethod("com.sina.weibo.models.CardList", loader, "initFromJsonObject", JSONObject.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    JSONObject json = (JSONObject) param.args[0];
+                    LogUtil.log(json.toString());
+                    JSONArray jsonArray = json.getJSONArray("cards");
+                    JSONArray newJsonArray = new JSONArray();
+                    if (jsonArray != null) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject card = jsonArray.getJSONObject(i);
+                            if (card != null) {
+                                if (card.isNull("card_type")) {
+                                    newJsonArray.put(card);
+                                    continue;
+                                }
+                                int cardType = card.getInt("card_type");
+                                if (cardType == 9 || cardType == 126) {
+                                    JSONObject optJSONObject = card.optJSONObject("mblog");
+                                    if (!shouldRemoveCardMblog(optJSONObject)) {
+                                        newJsonArray.put(card);
+                                    }
+                                } else if (cardType == 11) {
+                                    if (!card.isNull("show_type") && !card.isNull("card_group")) {
+                                        int showType = card.getInt("show_type");
+                                        JSONArray cardGroup = card.getJSONArray("card_group");
+                                        JSONArray newCardGroup = new JSONArray();
+                                        if (showType == 3 && cardGroup.length() == 2) {
+
+                                            if (!hideFindPageNav) {
+                                                newCardGroup.put(cardGroup.getJSONObject(0));
+                                            }
+                                            if (!hideFindPageCarousel) {
+                                                newCardGroup.put(cardGroup.getJSONObject(1));
+                                            }
+                                            if (!hideFindPageNav || !hideFindPageCarousel) {
+                                                card.put("card_group", newCardGroup);
+                                                newJsonArray.put(card);
+                                            }
+                                        } else {
+                                            newJsonArray.put(card);
+                                        }
+                                    }
+                                } else {
+                                    newJsonArray.put(card);
+                                }
+                            }
+                        }
+                    }
+                    json.put("cards", newJsonArray);
+                    param.args[0] = json;
+                }
+            });
+        } catch (Exception e) {
+            LogUtil.log(e.getMessage());
+        }
     }
 
     private List removeAd(ArrayList arrayList) {
@@ -106,7 +186,7 @@ public class AdHook extends BaseHook {
             Iterator it = arrayList.iterator();
             while (it.hasNext()) {
                 Object obj = it.next();
-                if (!shouldRemove(obj)) {
+                if (!shouldRemoveStatus(obj)) {
                     list.add(obj);
                 }
             }
@@ -114,22 +194,57 @@ public class AdHook extends BaseHook {
         return list;
     }
 
-    private Boolean shouldRemove(Object mblog) {
+    private Boolean shouldRemoveStatus(Object mblog) {
         if (isPromotion(mblog)) return true;
         String text = (String) XposedHelpers.getObjectField(mblog, "text");
-//        if (text != null) {
-//            if (checkText(text, content_keyword)) return true;
-//        }
+        if (StringUtil.isNotEmpty(text)) {
+            if (checkText(text, config.getString(String.valueOf(R.id.filter_content_key_word)))) return true;
+        }
 
         Object user = XposedHelpers.getObjectField(mblog, "user");
-//        if (user != null) {
-//            String name = (String) XposedHelpers.getObjectField(user, "screen_name");
-//            if (checkText(name, user_keyword)) return true;
-//        }
+        if (user != null) {
+            String name = (String) XposedHelpers.getObjectField(user, "screen_name");
+            if (checkText(name, config.getString(String.valueOf(R.id.filter_user_key_word)))) return true;
+        }
 
         Object retweeted = XposedHelpers.getObjectField(mblog, "retweeted_status");
         if (retweeted != null) {
-            if (shouldRemove(retweeted)) return true;
+            if (shouldRemoveStatus(retweeted)) return true;
+        }
+        return false;
+    }
+
+    private Boolean shouldRemoveCardMblog(JSONObject cardMblog) {
+        try {
+            if (cardMblog == null) return false;
+            if (!cardMblog.isNull("promotion")) {
+                JSONObject promotion = cardMblog.getJSONObject("promotion");
+                String ad_type = promotion.getString("adtype");
+                if (!cancelHideContentHot) {
+                    return true;
+                } else {
+                    if ("8" != ad_type) {
+                        return true;
+                    }
+                }
+            }
+            String text = cardMblog.getString("text");
+            if (StringUtil.isNotEmpty(text)) {
+                if (checkText(text, config.getString(String.valueOf(R.id.filter_content_key_word)))) return true;
+            }
+
+            JSONObject user = cardMblog.getJSONObject("user");
+            if (user != null) {
+                String name = user.getString("screen_name");
+                if (checkText(name, config.getString(String.valueOf(R.id.filter_user_key_word)))) return true;
+            }
+
+            JSONObject retweeted = cardMblog.getJSONObject("retweeted_status");
+            if (retweeted != null) {
+                if (shouldRemoveCardMblog(retweeted)) return true;
+            }
+        } catch (Exception e) {
+            LogUtil.log("判断是否移除话题卡片广告出错:" + e.getMessage());
         }
         return false;
     }
@@ -143,6 +258,22 @@ public class AdHook extends BaseHook {
                 return true;
             } else {
                 return "8" != ad_type;
+            }
+        }
+        return false;
+    }
+
+    private Boolean checkText(String str, String keyWords) {
+        if (StringUtil.isEmpty(keyWords)) {
+            return false;
+        }
+        String[] keyArr = keyWords.split(",");
+        if (keyArr.length <= 0) {
+            return false;
+        }
+        for (String strTemp : keyArr) {
+            if (str.indexOf(strTemp) != -1) {
+                return true;
             }
         }
         return false;

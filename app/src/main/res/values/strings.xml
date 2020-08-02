@@ -7,4 +7,20 @@
     <string name="work_right_now">更改立即生效</string>
     <string name="work_after_reload">更改在结束软件进程或者重启后生效</string>
     <string name="msg_module_not_active">模块未激活，请先激活模块并重启手机！</string>
+    <string name="tip_0">微博版本: Unknown</string>
+    <string name="hide_icon">隐藏模块桌面图标</string>
+    <string name="active_module">启用模块</string>
+    <string name="skip_start_activity_ad">去除启动页广告</string>
+    <string name="hide_top_hongbao">隐藏首页右上角红包样式</string>
+    <string name="auto_sign">自动签到</string>
+    <string name="hide_hongbao">隐藏首页红包浮窗</string>
+    <string name="auto_get_hongbao">自动领取浮窗红包</string>
+    <string name="hide_content_ad">隐藏微博时间线广告</string>
+    <string name="cancel_hide_content_hot">取消隐藏时间线热门</string>
+    <string name="filter_content_key_word">屏蔽的内容关键词(,隔开)</string>
+    <string name="filter_user_key_word">屏蔽的用户关键词(,隔开)</string>
+    <string name="hide_detail_ad">隐藏微博详情广告</string>
+    <string name="hide_detail_share">隐藏微博详情底部分享面板</string>
+    <string name="hide_comment_ad">隐藏评论区广告</string>
+
 </resources>

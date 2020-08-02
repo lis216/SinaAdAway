@@ -18,7 +18,7 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <TextView
-                    android:text="微博版本: Unknown"
+                    android:text="@string/tip_0"
                     android:layout_width="match_parent"
                     android:layout_height="40dp" android:background="#F2F2F2" android:id="@+id/tip_0"
                     android:padding="10dp" android:textColor="#3e86a0"/>
@@ -27,12 +27,12 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <Switch
-                    android:text="隐藏模块桌面图标"
+                    android:text="@string/hide_icon"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_icon" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="启用模块"
+                    android:text="@string/active_module"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/active_module" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
@@ -50,59 +50,83 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <Switch
-                    android:text="去除启动页广告"
+                    android:text="@string/skip_start_activity_ad"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/skip_start_activity_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="隐藏首页右上角红包样式"
+                    android:text="@string/hide_top_hongbao"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_top_hongbao" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="自动签到"
+                    android:text="@string/auto_sign"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/auto_sign" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="隐藏首页红包浮窗"
+                    android:text="@string/hide_hongbao"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_hongbao" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="自动领取浮窗红包"
+                    android:text="@string/auto_get_hongbao"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/auto_get_hongbao" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="隐藏微博时间线广告"
+                    android:text="@string/hide_content_ad"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_content_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="取消隐藏时间线热门"
+                    android:text="@string/cancel_hide_content_hot"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/cancel_hide_content_hot" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
+            <TextView
+                    android:text="@string/filter_content_key_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:gravity="center_vertical"
+                    android:id="@+id/filter_content_key_word"
+                    android:padding="10dp"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
+            <TextView
+                    android:text="@string/filter_user_key_word"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:gravity="center_vertical"
+                    android:id="@+id/filter_user_key_word"
+                    android:padding="10dp"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
             <Switch
-                    android:text="隐藏微博详情广告"
+                    android:text="@string/hide_detail_ad"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_detail_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="隐藏微博详情底部分享面板"
+                    android:text="@string/hide_detail_share"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_detail_share" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
-                    android:text="隐藏评论区广告"
+                    android:text="@string/hide_comment_ad"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_comment_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
                     android:text="隐藏微博头像挂件"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp" android:id="@+id/hide_person_pendant" android:paddingLeft="10dp"
+                    android:layout_height="50dp" android:id="@+id/hide_person_head_pendant" android:paddingLeft="10dp"
                     android:paddingRight="10dp" android:visibility="gone"/>
             <Switch
                     android:text="隐藏微博个性背景"
@@ -110,10 +134,25 @@
                     android:layout_height="50dp" android:id="@+id/hide_person_background" android:paddingLeft="10dp"
                     android:paddingRight="10dp" android:visibility="gone"/>
             <Switch
+                    android:text="隐藏发现页导航栏"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_find_page_nav" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
                     android:text="隐藏发现页轮播图"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_find_page_carousel" android:paddingLeft="10dp"
-                    android:paddingRight="10dp" android:visibility="gone"/>
+                    android:paddingRight="10dp"/>
+            <Button
+                    android:id="@+id/submit_question"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="问题反馈"/>
+            <Button
+                    android:id="@+id/download_apk"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="下载"/>
             <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -132,8 +171,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="支付宝"/>
-
-
             <Button
                     android:id="@+id/btn_weixin"
                     android:layout_width="match_parent"

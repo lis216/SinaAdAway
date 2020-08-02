@@ -1,11 +1,13 @@
 package me.lee.adaway.sina;
 
 import android.Manifest;
-import android.content.ComponentName;
+import android.app.AlertDialog;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.didikee.donate.AlipayDonate;
 import android.didikee.donate.WeiXinDonate;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import me.lee.adaway.sina.constant.HookConstant;
+import me.lee.adaway.sina.utils.StringUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -20,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends BaseAppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class MainActivity extends BaseAppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     private Button btn_zhifubao;
 
@@ -41,28 +44,68 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 ((Switch) viewTemp).setChecked(getBoolean(String.valueOf(viewTemp.getId())));
             }
         }
+
         TextView tips = findViewById(R.id.tip_0);
+        Button downloadBtn = findViewById(R.id.download_apk);
         initView();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                HookPackage.initSurportVersion();
+                HookPackage.initPackage();
                 try {
-                    String versionName = getPackageManager()
-                            .getPackageInfo(HookConstant.HOOK_PACKAGE_NAME, 0).versionName;
-                    String text = "微博版本: v" + versionName;
-                    if (HookPackage.isSupport(versionName)) {
-                        text = text + " 已适配!";
-                    } else {
-                        text = text + " 未适配, 部分功能可能无效!";
-                    }
+                    String tip = "下载(当前:" + BuildConfig.VERSION_NAME + "  最新: " + HookPackage.getLastVersionName() + ")";
+                    downloadBtn.setText(tip);
+                    String versionName = getPackageManager().getPackageInfo(HookConstant.HOOK_PACKAGE_NAME, 0).versionName;
+                    String text = "版本: " + versionName + " - " + BuildConfig.VERSION_NAME + "(" + HookPackage.isPerfectSupport(versionName) + ")";
                     tips.setText(text);
+                    if (StringUtil.isNotEmpty(HookPackage.getNotice())) {
+                        tips.setText(HookPackage.getNotice());
+                    }
                 } catch (PackageManager.NameNotFoundException e) {
-                    tips.setText("微博版本: Unknown");
+                    tips.setText(R.string.tip_0);
                 }
             }
         }).start();
     }
+
+    class MyOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.submit_question:
+                    Intent intent = new Intent();
+                    intent.setAction("android.intent.action.VIEW");
+                    Uri content_url = Uri.parse("https://support.qq.com/products/181702");
+                    intent.setData(content_url);
+                    startActivity(intent);
+                    break;
+                case R.id.btn_zhifubao:
+                    donateAlipay(payCode);
+                    break;
+                case R.id.btn_weixin:
+                    donateWeixin();
+                    break;
+                case R.id.filter_content_key_word:
+                    inputTitleDialog("输入关键词", "含关键词的微博将被过滤", R.id.filter_content_key_word);
+                    break;
+                case R.id.filter_user_key_word:
+                    inputTitleDialog("输入关键词", "用户名含关键词的微博将被过滤", R.id.filter_user_key_word);
+                    break;
+                case R.id.download_apk:
+                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    // 将文本内容放到系统剪贴板里。
+                    cm.setText("6666");
+                    Toast.makeText(MainActivity.this, "密码复制成功!", Toast.LENGTH_LONG).show();
+                    Intent downloadIntent = new Intent();
+                    downloadIntent.setAction("android.intent.action.VIEW");
+                    Uri downloadUrl = Uri.parse("https://wws.lanzous.com/b01hk8zfc");
+                    downloadIntent.setData(downloadUrl);
+                    startActivity(downloadIntent);
+                    break;
+            }
+        }
+    }
+
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -103,12 +146,14 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
             case R.id.hide_detail_ad:
             case R.id.hide_detail_share:
             case R.id.hide_comment_ad:
+            case R.id.hide_find_page_nav:
             case R.id.hide_find_page_carousel:
             case R.id.cancel_hide_content_hot:
+            case R.id.hide_person_head_pendant:
+            case R.id.hide_person_background:
                 break;
             default:
                 if (b) {
-                    Toast.makeText(this, "功能暂未实现!", Toast.LENGTH_SHORT).show();
                     compoundButton.setChecked(false);
                     putBoolean(String.valueOf(compoundButton.getId()), false);
                     HookPackage.getConfig().put(String.valueOf(compoundButton.getId()), false);
@@ -126,6 +171,41 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
             packageManager.setComponentEnabledSetting(aliasName, status, PackageManager.DONT_KILL_APP);
         }
     }
+
+    private void inputTitleDialog(String title, String message, int viewId) {
+
+        final EditText input = new EditText(this);
+        input.setFocusable(true);
+        String cacheWords = HookPackage.getConfig().getString(String.valueOf(viewId));
+        input.setText(cacheWords);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title).setMessage(message).setView(input).setNegativeButton("确定", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                String words = input.getText().toString();
+                TextView view = findViewById(viewId);
+                if (StringUtil.isNotEmpty(words)) {
+                    HookPackage.getConfig().put(String.valueOf(viewId), words);
+                    HookPackage.saveConfig();
+                    view.setText(words);
+                } else {
+                    HookPackage.getConfig().remove(String.valueOf(viewId));
+                    HookPackage.saveConfig();
+                    switch (viewId) {
+                        case R.id.filter_content_key_word:
+                            view.setText(R.string.filter_content_key_word);
+                            break;
+                        case R.id.filter_user_key_word:
+                            view.setText(R.string.filter_user_key_word);
+                            break;
+                    }
+                }
+
+            }
+        });
+        builder.show();
+    }
+
 
     private void applyAuth() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -167,25 +247,34 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
 
 
     private void initView() {
+        //支付宝捐赠
         btn_zhifubao = (Button) findViewById(R.id.btn_zhifubao);
-        btn_zhifubao.setOnClickListener(this);
+        btn_zhifubao.setOnClickListener(new MyOnClickListener());
+        // 微信捐赠
         btn_weixin = (Button) findViewById(R.id.btn_weixin);
-        btn_weixin.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_zhifubao:
-
-                donateAlipay(payCode);
-                break;
-            case R.id.btn_weixin:
-
-                donateWeixin();
-                break;
+        btn_weixin.setOnClickListener(new MyOnClickListener());
+        // 问题反馈
+        Button button = findViewById(R.id.submit_question);
+        button.setOnClickListener(new MyOnClickListener());
+        // 内容过滤
+        TextView contentKeyWord = findViewById(R.id.filter_content_key_word);
+        contentKeyWord.setOnClickListener(new MyOnClickListener());
+        String cacheContentWords = HookPackage.getConfig().getString(String.valueOf(R.id.filter_content_key_word));
+        if (StringUtil.isNotEmpty(cacheContentWords)) {
+            contentKeyWord.setText(cacheContentWords);
         }
+        // 用户过滤输入框
+        TextView userKeyWord = findViewById(R.id.filter_user_key_word);
+        userKeyWord.setOnClickListener(new MyOnClickListener());
+        String cacheUserWords = HookPackage.getConfig().getString(String.valueOf(R.id.filter_user_key_word));
+        if (StringUtil.isNotEmpty(cacheUserWords)) {
+            userKeyWord.setText(cacheUserWords);
+        }
+
+        Button downloadBtn = findViewById(R.id.download_apk);
+        downloadBtn.setOnClickListener(new MyOnClickListener());
     }
+
 
     /**
      * 需要提前准备好 微信收款码 照片，可通过微信客户端生成

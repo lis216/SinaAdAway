@@ -23,7 +23,13 @@ public abstract class BaseHook {
     protected abstract void hookMain();
 
     public final void startHook() {
-        if (disableHook()) return;
+        HookPackage.initPackage();
+        if (!HookPackage.isEnabled()) {
+            return;
+        }
+        if (!HookPackage.isVersionEnabled()) {
+            return;
+        }
         try {
             hookMain();
         } catch (Throwable t) {

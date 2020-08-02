@@ -45,7 +45,7 @@ public class HomePageHook extends BaseHook {
     private void hideTopHongbao() {
         try {
             Class FeedRedPacket = loader.loadClass("com.sina.weibo.models.FeedRedPacket");
-            HookUtil.findAndHookMethod("com.sina.weibo.utils.bw", loader, "a", Context.class, ViewGroup.class, FeedRedPacket, new XC_MethodHook() {
+            HookUtil.findAndHookMethod("com.sina.weibo.utils.bx", loader, "a", Context.class, ViewGroup.class, FeedRedPacket, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
@@ -94,7 +94,7 @@ public class HomePageHook extends BaseHook {
     }
 
     private void autoGetHongbao() {
-        HookUtil.findAndHookMethod("com.sina.weibo.feed.r.a", loader, "a", int.class, new XC_MethodHook() {
+        HookUtil.findAndHookMethod("com.sina.weibo.feed.q.a", loader, "a", int.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
