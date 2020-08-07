@@ -20,7 +20,6 @@ import java.util.List;
 import static me.lee.adaway.sina.utils.HookUtil.showToast;
 
 public final class HookPackage {
-
     private static String versionName;
     private static int versionCode;
     private static ClassLoader loader;

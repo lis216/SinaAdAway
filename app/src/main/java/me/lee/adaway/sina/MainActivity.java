@@ -44,28 +44,8 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 ((Switch) viewTemp).setChecked(getBoolean(String.valueOf(viewTemp.getId())));
             }
         }
-
-        TextView tips = findViewById(R.id.tip_0);
-        Button downloadBtn = findViewById(R.id.download_apk);
         initView();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                HookRemoteConfig remoteConfig = HookPackage.getRemoteConfig();
-                try {
-                    String tip = "下载(当前:" + BuildConfig.VERSION_NAME + "  最新: " + remoteConfig.getLastVersionName() + ")";
-                    downloadBtn.setText(tip);
-                    String versionName = getPackageManager().getPackageInfo(HookConstant.HOOK_PACKAGE_NAME, 0).versionName;
-                    String text = "版本: " + versionName + " - " + BuildConfig.VERSION_NAME + "(" + remoteConfig.isPerfectSupport(versionName) + ")";
-                    tips.setText(text);
-                    if (StringUtil.isNotEmpty(remoteConfig.getNotice())) {
-                        tips.setText(remoteConfig.getNotice());
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    tips.setText(R.string.tip_0);
-                }
-            }
-        }).start();
+
     }
 
     class MyOnClickListener implements View.OnClickListener {
@@ -277,6 +257,31 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
 
         Button downloadBtn = findViewById(R.id.download_apk);
         downloadBtn.setOnClickListener(new MyOnClickListener());
+        TextView tips = findViewById(R.id.tip_0);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HookRemoteConfig remoteConfig = HookPackage.getRemoteConfig();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String tip = "下载(当前:" + BuildConfig.VERSION_NAME + "  最新: " + remoteConfig.getLastVersionName() + ")";
+                            downloadBtn.setText(tip);
+                            String versionName = getPackageManager().getPackageInfo(HookConstant.HOOK_PACKAGE_NAME, 0).versionName;
+                            String text = "版本: " + versionName + " - " + BuildConfig.VERSION_NAME + "(" + remoteConfig.isPerfectSupport(versionName) + ")";
+                            tips.setText(text);
+                            if (StringUtil.isNotEmpty(remoteConfig.getNotice())) {
+                                tips.setText(remoteConfig.getNotice());
+                            }
+                        } catch (PackageManager.NameNotFoundException e) {
+                            tips.setText(R.string.tip_0);
+                        }
+                    }
+                });
+
+            }
+        }).start();
     }
 
 

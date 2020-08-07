@@ -7,7 +7,7 @@
     <string name="work_right_now">更改立即生效</string>
     <string name="work_after_reload">更改在结束软件进程或者重启后生效</string>
     <string name="msg_module_not_active">模块未激活，请先激活模块并重启手机！</string>
-    <string name="tip_0">微博版本: Unknown</string>
+    <string name="tip_0">微博版本: Unknown(正在获取...)</string>
     <string name="hide_icon">隐藏模块桌面图标</string>
     <string name="active_module">启用模块</string>
     <string name="remove_all_ad">一键去广告</string>

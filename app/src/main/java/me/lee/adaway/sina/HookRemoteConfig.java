@@ -20,7 +20,13 @@ public class HookRemoteConfig implements Serializable {
         if (versionConfig == null) {
             return "未获取到插件版本信息";
         }
-        if (versionConfig.getString(String.valueOf(BuildConfig.VERSION_CODE)).equals(versionName)) {
+        if (BuildConfig.VERSION_CODE > lastVersionCode) {
+            return "测试版本";
+        }
+        if (!isVersionEnabled()) {
+            return "此版本插件已失效,请下载最新版";
+        }
+        if (versionConfig.getString(String.valueOf(BuildConfig.VERSION_CODE)) != null && versionConfig.getString(String.valueOf(BuildConfig.VERSION_CODE)).equals(versionName)) {
             return "最佳适配";
         } else {
             if (versionList == null || versionList.size() == 0) {

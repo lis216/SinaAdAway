@@ -77,6 +77,8 @@ public class UserCenterHook extends BaseHook {
                                             }
                                         }
                                         card.put("card_group", newCardGroup);
+                                    } else {
+                                        hide = true;
                                     }
                                     break;
                             }
