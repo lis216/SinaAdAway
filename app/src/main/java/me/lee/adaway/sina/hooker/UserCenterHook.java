@@ -64,12 +64,10 @@ public class UserCenterHook extends BaseHook {
                                     if (hideDailv) hide = true;
                                     break;
                                 case "100505_-_managecard":
-                                    hide = true;
+                                    if (hideDraft) hide = true;
                                     break;
                                 case "100505_-_draft":
-                                    if (hideDraft && !cancelHideSport) {
-                                        hide = true;
-                                    } else {
+                                    if (cancelHideSport) {
                                         JSONArray cardGroup = card.getJSONArray("card_group");
                                         JSONArray newCardGroup = new JSONArray();
                                         for (int j = 0; j < cardGroup.length(); j++) {

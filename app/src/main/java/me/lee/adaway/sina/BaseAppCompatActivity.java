@@ -153,9 +153,8 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     }
 
     private void openExposed() {
-        String exposed = "me.weishu.exp";
-        if (HookUtil.isPackageInstalled(this, exposed)) {
-            Intent intent = new Intent(exposed + ".ACTION_MODULE_MANAGE");
+        if (HookUtil.isPackageInstalled(this, "me.weishu.exp")) {
+            Intent intent = new Intent("me.weishu.exp.ACTION_MODULE_MANAGE");
             intent.setData(Uri.parse("package:" + HookConstant.MODULE_PACKAGE_NAME));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
