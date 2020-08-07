@@ -3,6 +3,7 @@ package me.lee.adaway.sina.hooker;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -21,22 +22,16 @@ import java.util.List;
 
 public class AdHook extends BaseHook {
 
-    private Boolean skipStartActivityAd;
-    private Boolean hideContentAd;
+    private Boolean removeAllAd;
     private Boolean cancelHideContentHot;
-    private Boolean hideDetailAd;
     private Boolean hideDetailShare;
-    private Boolean hideCommentAd;
     private Boolean hideFindPageCarousel;
     private Boolean hideFindPageNav;
 
     @Override
     protected void initConfig() {
-        skipStartActivityAd = config.getBoolean(String.valueOf(R.id.skip_start_activity_ad));
-        hideContentAd = config.getBoolean(String.valueOf(R.id.hide_content_ad));
-        hideDetailAd = config.getBoolean(String.valueOf(R.id.hide_detail_ad));
+        removeAllAd = config.getBoolean(String.valueOf(R.id.remove_all_ad));
         hideDetailShare = config.getBoolean(String.valueOf(R.id.hide_detail_share));
-        hideCommentAd = config.getBoolean(String.valueOf(R.id.hide_comment_ad));
         cancelHideContentHot = config.getBoolean(String.valueOf(R.id.cancel_hide_content_hot));
         hideFindPageCarousel = config.getBoolean(String.valueOf(R.id.hide_find_page_carousel));
         hideFindPageNav = config.getBoolean(String.valueOf(R.id.hide_find_page_nav));
@@ -45,11 +40,14 @@ public class AdHook extends BaseHook {
     @Override
     protected void hookMain() {
         loadConfig();
-        if (skipStartActivityAd) skipStartActivityAd();
-        if (hideContentAd) hideContentAd();
-        if (hideDetailAd) hideDetailAd();
+        if (removeAllAd) {
+            skipStartActivityAd();
+            hideContentAd();
+            hideDetailAd();
+            hideCommentAd();
+            hideVideoPageAd();
+        }
         if (hideDetailShare) hideDetailShare();
-        if (hideCommentAd) hideCommentAd();
     }
 
     private void skipStartActivityAd() {
@@ -106,8 +104,9 @@ public class AdHook extends BaseHook {
         HookUtil.findAndHookMethod(className, loader, "insetTrend", replaceNull());
 
         try {
-            Class CardList = loader.loadClass("com.sina.weibo.models.CardList");
+
             // 话题头回调显示
+            //Class CardList = loader.loadClass("com.sina.weibo.models.CardList");
             //HookUtil.findAndHookMethod("com.sina.weibo.page.SearchResultActivity", loader, "netCallback", String.class, CardList, replaceNull());
             //HookUtil.findAndHookMethod("com.sina.weibo.page.NewCardListActivity", loader, "netCallback", String.class, CardList, replaceNull());
             // 卡片初始化  在此移除会导致空指针
@@ -127,7 +126,6 @@ public class AdHook extends BaseHook {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     JSONObject json = (JSONObject) param.args[0];
-                    LogUtil.log(json.toString());
                     JSONArray jsonArray = json.getJSONArray("cards");
                     JSONArray newJsonArray = new JSONArray();
                     if (jsonArray != null) {
@@ -150,11 +148,11 @@ public class AdHook extends BaseHook {
                                         JSONArray cardGroup = card.getJSONArray("card_group");
                                         JSONArray newCardGroup = new JSONArray();
                                         if (showType == 3 && cardGroup.length() == 2) {
-
-                                            if (!hideFindPageNav) {
+                                            LogUtil.log(cardGroup.toString());
+                                            if (!hideFindPageNav && cardGroup.getJSONObject(0).getInt("card_type") == 19 && !cardGroup.getJSONObject(0).isNull("posid")) {
                                                 newCardGroup.put(cardGroup.getJSONObject(0));
                                             }
-                                            if (!hideFindPageCarousel) {
+                                            if (!hideFindPageCarousel && cardGroup.getJSONObject(0).getInt("card_type") == 118) {
                                                 newCardGroup.put(cardGroup.getJSONObject(1));
                                             }
                                             if (!hideFindPageNav || !hideFindPageCarousel) {
@@ -164,6 +162,8 @@ public class AdHook extends BaseHook {
                                         } else {
                                             newJsonArray.put(card);
                                         }
+                                    } else {
+                                        newJsonArray.put(card);
                                     }
                                 } else {
                                     newJsonArray.put(card);
@@ -176,7 +176,6 @@ public class AdHook extends BaseHook {
                 }
             });
         } catch (Exception e) {
-            LogUtil.log(e.getMessage());
         }
     }
 
@@ -239,12 +238,12 @@ public class AdHook extends BaseHook {
                 if (checkText(name, config.getString(String.valueOf(R.id.filter_user_key_word)))) return true;
             }
 
-            JSONObject retweeted = cardMblog.getJSONObject("retweeted_status");
-            if (retweeted != null) {
+            if (!cardMblog.isNull("retweeted_status")) {
+                JSONObject retweeted = cardMblog.getJSONObject("retweeted_status");
                 if (shouldRemoveCardMblog(retweeted)) return true;
             }
         } catch (Exception e) {
-            LogUtil.log("判断是否移除话题卡片广告出错:" + e.getMessage());
+
         }
         return false;
     }
@@ -341,7 +340,7 @@ public class AdHook extends BaseHook {
                 }
 
             });*/
-            HookUtil.findAndHookConstructor("com.sina.weibo.feed.j.c", loader, JSONObject.class, new XC_MethodHook() {
+            HookUtil.findAndHookMethod("com.sina.weibo.mpc.models.CommentDataMPC", loader, "New", JSONObject.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
@@ -353,9 +352,47 @@ public class AdHook extends BaseHook {
                     }
                 }
             });
+            HookUtil.findAndHookMethod("com.sina.weibo.view.CommonLoadMoreView", loader, "a", Context.class, int.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    LinearLayout view = getObject(param.thisObject, LinearLayout.class, "e");
+                    view.setVisibility(View.GONE);
+                }
+            });
+//            HookUtil.findAndHookConstructor("com.sina.weibo.feed.j.c", loader, JSONObject.class, new XC_MethodHook() {
+//                @Override
+//                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                    super.beforeHookedMethod(param);
+//                    JSONObject jsonObject = (JSONObject) param.args[0];
+//                    if (jsonObject != null) {
+//                        if (jsonObject.getInt("type") != 0) {
+//                            param.args[0] = null;
+//                        }
+//                    }
+//                }
+//            });
 
         } catch (Exception e) {
-            LogUtil.log(e.getMessage());
+
         }
+    }
+
+    private void hideVideoPageAd() {
+        try {
+            Class ExpandableBannerView = loader.loadClass("com.sina.weibo.video.detail2.view.ExpandableBannerView");
+            Class ExpandableInfo = loader.loadClass("com.sina.weibo.models.MBlogListObject$ExpandableInfo");
+            HookUtil.findAndHookMethod("com.sina.weibo.video.detail2.view.a", loader, "a", ExpandableInfo, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    hideView(param.thisObject, ExpandableBannerView, "d");
+                    hideView(param.thisObject, ExpandableBannerView, "e");
+                }
+            });
+        } catch (Exception e) {
+
+        }
+
     }
 }

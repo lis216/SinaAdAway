@@ -53,12 +53,11 @@ public class HomePageHook extends BaseHook {
                     viewGroup.setVisibility(View.GONE);
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
                     if (autoSign && !formatter.format(new Date()).equals(config.getString("signDate"))) {
-                        viewGroup.callOnClick();
                         signDate = formatter.format(new Date());
-                        HookPackage.getConfig().put("signDate", signDate);
-                        HookPackage.saveConfig();
+                        HookPackage.putLocalConfig("signDate", signDate);
                         loadConfig();
                         close = true;
+                        viewGroup.callOnClick();
                     }
                 }
             });

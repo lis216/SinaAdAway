@@ -51,15 +51,15 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
         new Thread(new Runnable() {
             @Override
             public void run() {
-                HookPackage.initPackage();
+                HookRemoteConfig remoteConfig = HookPackage.getRemoteConfig();
                 try {
-                    String tip = "下载(当前:" + BuildConfig.VERSION_NAME + "  最新: " + HookPackage.getLastVersionName() + ")";
+                    String tip = "下载(当前:" + BuildConfig.VERSION_NAME + "  最新: " + remoteConfig.getLastVersionName() + ")";
                     downloadBtn.setText(tip);
                     String versionName = getPackageManager().getPackageInfo(HookConstant.HOOK_PACKAGE_NAME, 0).versionName;
-                    String text = "版本: " + versionName + " - " + BuildConfig.VERSION_NAME + "(" + HookPackage.isPerfectSupport(versionName) + ")";
+                    String text = "版本: " + versionName + " - " + BuildConfig.VERSION_NAME + "(" + remoteConfig.isPerfectSupport(versionName) + ")";
                     tips.setText(text);
-                    if (StringUtil.isNotEmpty(HookPackage.getNotice())) {
-                        tips.setText(HookPackage.getNotice());
+                    if (StringUtil.isNotEmpty(remoteConfig.getNotice())) {
+                        tips.setText(remoteConfig.getNotice());
                     }
                 } catch (PackageManager.NameNotFoundException e) {
                     tips.setText(R.string.tip_0);
@@ -109,8 +109,8 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        HookPackage.getConfig().put(String.valueOf(compoundButton.getId()), b);
-        putBoolean(String.valueOf(compoundButton.getId()), b);
+        String key = String.valueOf(compoundButton.getId());
+        Boolean value = b;
         switch (compoundButton.getId()) {
             case R.id.hide_icon:
                 changeIconStatus(!b);
@@ -137,30 +137,36 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                     }
                 }
                 break;
-            case R.id.skip_start_activity_ad:
+            case R.id.remove_all_ad:
             case R.id.hide_top_hongbao:
             case R.id.auto_sign:
             case R.id.hide_hongbao:
             case R.id.auto_get_hongbao:
-            case R.id.hide_content_ad:
-            case R.id.hide_detail_ad:
             case R.id.hide_detail_share:
-            case R.id.hide_comment_ad:
             case R.id.hide_find_page_nav:
             case R.id.hide_find_page_carousel:
             case R.id.cancel_hide_content_hot:
             case R.id.hide_person_head_pendant:
             case R.id.hide_person_background:
+            case R.id.hide_setting:
+            case R.id.hide_visit:
+            case R.id.hide_chaohua:
+            case R.id.hide_publicwelfare:
+            case R.id.hide_examination:
+            case R.id.hide_dailv:
+            case R.id.hide_draft:
+            case R.id.cancel_hide_sport:
                 break;
             default:
                 if (b) {
                     compoundButton.setChecked(false);
-                    putBoolean(String.valueOf(compoundButton.getId()), false);
-                    HookPackage.getConfig().put(String.valueOf(compoundButton.getId()), false);
+                    value = false;
+
                 }
                 break;
         }
-        HookPackage.saveConfig();
+        putBoolean(key, value);
+        HookPackage.putLocalConfig(key, value);
     }
 
     private void changeIconStatus(boolean isShow) {
@@ -176,7 +182,7 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
 
         final EditText input = new EditText(this);
         input.setFocusable(true);
-        String cacheWords = HookPackage.getConfig().getString(String.valueOf(viewId));
+        String cacheWords = HookPackage.getLocalConfig().getString(String.valueOf(viewId));
         input.setText(cacheWords);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -185,12 +191,10 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 String words = input.getText().toString();
                 TextView view = findViewById(viewId);
                 if (StringUtil.isNotEmpty(words)) {
-                    HookPackage.getConfig().put(String.valueOf(viewId), words);
-                    HookPackage.saveConfig();
+                    HookPackage.putLocalConfig(String.valueOf(viewId), words);
                     view.setText(words);
                 } else {
-                    HookPackage.getConfig().remove(String.valueOf(viewId));
-                    HookPackage.saveConfig();
+                    HookPackage.removeLocalConfig(String.valueOf(viewId));
                     switch (viewId) {
                         case R.id.filter_content_key_word:
                             view.setText(R.string.filter_content_key_word);
@@ -259,14 +263,14 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
         // 内容过滤
         TextView contentKeyWord = findViewById(R.id.filter_content_key_word);
         contentKeyWord.setOnClickListener(new MyOnClickListener());
-        String cacheContentWords = HookPackage.getConfig().getString(String.valueOf(R.id.filter_content_key_word));
+        String cacheContentWords = HookPackage.getLocalConfig().getString(String.valueOf(R.id.filter_content_key_word));
         if (StringUtil.isNotEmpty(cacheContentWords)) {
             contentKeyWord.setText(cacheContentWords);
         }
         // 用户过滤输入框
         TextView userKeyWord = findViewById(R.id.filter_user_key_word);
         userKeyWord.setOnClickListener(new MyOnClickListener());
-        String cacheUserWords = HookPackage.getConfig().getString(String.valueOf(R.id.filter_user_key_word));
+        String cacheUserWords = HookPackage.getLocalConfig().getString(String.valueOf(R.id.filter_user_key_word));
         if (StringUtil.isNotEmpty(cacheUserWords)) {
             userKeyWord.setText(cacheUserWords);
         }

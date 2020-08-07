@@ -1,10 +1,7 @@
 package me.lee.adaway.sina.hooker;
 
-import android.content.Context;
-import de.robv.android.xposed.XC_MethodHook;
 import me.lee.adaway.sina.R;
 import me.lee.adaway.sina.hooker.base.BaseHook;
-import me.lee.adaway.sina.utils.HookUtil;
 
 public class MblogHook extends BaseHook {
 
@@ -25,12 +22,7 @@ public class MblogHook extends BaseHook {
     }
 
     private void hidePersonHeadPendant() {
-        HookUtil.findAndHookConstructor("com.sina.weibo.feed.view.MblogTitleView", loader, Context.class, new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                super.afterHookedMethod(param);
-            }
-        });
+        
     }
 
     private void hidePersonBackground() {

@@ -41,7 +41,7 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <TextView
-                    android:text="功能设置"
+                    android:text="通用设置"
                     android:layout_width="match_parent"
                     android:layout_height="40dp" android:background="#F2F2F2" android:id="@+id/tip_1"
                     android:padding="10dp" android:textColor="#3e86a0"/>
@@ -50,9 +50,9 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <Switch
-                    android:text="@string/skip_start_activity_ad"
+                    android:text="@string/remove_all_ad"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp" android:id="@+id/skip_start_activity_ad" android:paddingLeft="10dp"
+                    android:layout_height="50dp" android:id="@+id/remove_all_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
                     android:text="@string/hide_top_hongbao"
@@ -73,11 +73,6 @@
                     android:text="@string/auto_get_hongbao"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/auto_get_hongbao" android:paddingLeft="10dp"
-                    android:paddingRight="10dp"/>
-            <Switch
-                    android:text="@string/hide_content_ad"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp" android:id="@+id/hide_content_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
                     android:text="@string/cancel_hide_content_hot"
@@ -109,19 +104,9 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <Switch
-                    android:text="@string/hide_detail_ad"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp" android:id="@+id/hide_detail_ad" android:paddingLeft="10dp"
-                    android:paddingRight="10dp"/>
-            <Switch
                     android:text="@string/hide_detail_share"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_detail_share" android:paddingLeft="10dp"
-                    android:paddingRight="10dp"/>
-            <Switch
-                    android:text="@string/hide_comment_ad"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp" android:id="@+id/hide_comment_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
                     android:text="隐藏微博头像挂件"
@@ -133,6 +118,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_person_background" android:paddingLeft="10dp"
                     android:paddingRight="10dp" android:visibility="gone"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
+            <TextView
+                    android:text="发现页"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp" android:background="#F2F2F2" android:id="@+id/tip_3"
+                    android:padding="10dp" android:textColor="#3e86a0"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
+            <Switch
+                    android:text="隐藏发现页热搜"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_find_page_hot" android:paddingLeft="10dp"
+                    android:paddingRight="10dp" android:visibility="gone"/>
             <Switch
                     android:text="隐藏发现页导航栏"
                     android:layout_width="match_parent"
@@ -142,6 +145,60 @@
                     android:text="隐藏发现页轮播图"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_find_page_carousel" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
+            <TextView
+                    android:text="个人中心"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp" android:background="#F2F2F2" android:id="@+id/tip_4"
+                    android:padding="10dp" android:textColor="#3e86a0"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F2F2F2"/>
+
+            <Switch
+                    android:text="隐藏功能设置"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_setting" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="隐藏经常访问"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_visit" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="隐藏超话社区"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_chaohua" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="隐藏微公益"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_publicwelfare" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="隐藏微博关注检测"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_examination" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="隐藏带微博去旅行"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_dailv" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="隐藏更多功能卡片"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_draft" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
+                    android:text="取消隐藏微博运动"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/cancel_hide_sport" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Button
                     android:id="@+id/submit_question"

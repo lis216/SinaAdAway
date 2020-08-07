@@ -17,19 +17,12 @@ public abstract class BaseHook {
 
     public BaseHook() {
         this.loader = HookPackage.getLoader();
-        this.config = HookPackage.getConfig();
+        this.config = HookPackage.getLocalConfig();
     }
 
     protected abstract void hookMain();
 
     public final void startHook() {
-        HookPackage.initPackage();
-        if (!HookPackage.isEnabled()) {
-            return;
-        }
-        if (!HookPackage.isVersionEnabled()) {
-            return;
-        }
         try {
             hookMain();
         } catch (Throwable t) {
@@ -42,7 +35,7 @@ public abstract class BaseHook {
     }
 
     protected final void loadConfig() {
-        this.config = HookPackage.loadConfig();
+        this.config = HookPackage.getLocalConfig();
         initConfig();
     }
 
