@@ -11,6 +11,7 @@
     <string name="hide_icon">隐藏模块桌面图标</string>
     <string name="active_module">启用模块</string>
     <string name="remove_all_ad">一键去广告</string>
+    <string name="hide_follow_recommend">隐藏关注页直播推荐</string>
     <string name="hide_top_hongbao">隐藏首页右上角红包样式</string>
     <string name="auto_sign">自动签到</string>
     <string name="hide_hongbao">隐藏首页红包浮窗</string>

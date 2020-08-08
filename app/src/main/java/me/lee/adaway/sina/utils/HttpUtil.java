@@ -27,6 +27,7 @@ public class HttpUtil {
             conn.disconnect();
             return builder.toString();
         } catch (Exception e) {
+            LogUtil.log(e);
             return null;
         }
 

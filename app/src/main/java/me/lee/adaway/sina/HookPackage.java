@@ -1,6 +1,8 @@
 package me.lee.adaway.sina;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import me.lee.adaway.sina.constant.HookConstant;
 import me.lee.adaway.sina.hooker.AdHook;
@@ -8,18 +10,14 @@ import me.lee.adaway.sina.hooker.HomePageHook;
 import me.lee.adaway.sina.hooker.MblogHook;
 import me.lee.adaway.sina.hooker.UserCenterHook;
 import me.lee.adaway.sina.hooker.base.BaseHook;
-import me.lee.adaway.sina.utils.FileUtil;
-import me.lee.adaway.sina.utils.HookUtil;
-import me.lee.adaway.sina.utils.HttpUtil;
-import me.lee.adaway.sina.utils.StringUtil;
+import me.lee.adaway.sina.utils.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.lee.adaway.sina.utils.HookUtil.showToast;
-
 public final class HookPackage {
+
     private static String versionName;
     private static int versionCode;
     private static ClassLoader loader;
@@ -38,9 +36,14 @@ public final class HookPackage {
         JSONObject config = localConfig.get();
         if (config == null) {
             config = new JSONObject();
-            String configStr = FileUtil.readFile(FileUtil.getSdDataDir() + "/config/config.json");
-            if (configStr != null && configStr.length() > 0) {
-                config = JSONObject.parseObject(configStr);
+            try {
+                String configStr = FileUtil.readFile(FileUtil.getSdDataDir() + "/config/config.json");
+                if (configStr != null && configStr.length() > 0) {
+                    config = JSONObject.parseObject(configStr);
+                }
+            } catch (Exception e) {
+                XposedBridge.log("暂无配置文件!");
+                XposedBridge.log(e);
             }
             localConfig = new WeakReference<>(config);
         }
@@ -51,6 +54,7 @@ public final class HookPackage {
         HookRemoteConfig config = remoteConfig.get();
         if (config == null) {
             config = loadRemoteConfig();
+            LogUtil.log("拉取远程配置:" + JSON.toJSONString(config));
             remoteConfig = new WeakReference<>(config);
         }
         return config;
@@ -63,7 +67,7 @@ public final class HookPackage {
 
     void hookHandler(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         if (!isHookSwitchOpened()) {
-            showToast("SinaAdAway已安装未启用!");
+            HookUtil.showToast("SinaAdAway已安装未启用!");
             return;
         }
         versionName = HookUtil.getVersionName(HookConstant.HOOK_PACKAGE_NAME);
@@ -73,6 +77,7 @@ public final class HookPackage {
     }
 
     private void startAllHook() {
+        HookUtil.showToast("SinaAdAway已加载!");
         HookRemoteConfig remoteConfig = getRemoteConfig();
         if (!remoteConfig.isEnabled() || !remoteConfig.isVersionEnabled()) {
             return;
@@ -113,8 +118,8 @@ public final class HookPackage {
     public static void putLocalConfig(String key, Object object) {
         JSONObject config = getLocalConfig();
         config.put(key, object);
-        FileUtil.writeFile(FileUtil.getSdDataDir() + "/config/", "config.json", JSONObject.toJSONString(config), false);
-        localConfig = new WeakReference<>(null);
+        FileUtil.writeFile(FileUtil.getSdDataDir() + "/config/", "config.json", config.toString(), false);
+        localConfig = new WeakReference<>(config);
     }
 
     public static void removeLocalConfig(String key) {
@@ -126,30 +131,47 @@ public final class HookPackage {
     public static HookRemoteConfig loadRemoteConfig() {
         HookRemoteConfig remoteConfig = new HookRemoteConfig();
         try {
-            String remoteConfigStr = HttpUtil.getPageContent(HookRemoteConfig.remoteConfigUrl);
-            if (StringUtil.isNotEmpty(remoteConfigStr)) {
-                JSONObject remoteConfigJson = JSONObject.parseObject(remoteConfigStr);
-                if (remoteConfigJson == null) {
-                    return remoteConfig;
+            JSONObject remoteConfigJson = getRemoteConfigJson();
+            remoteConfig.setEnabled(remoteConfigJson.getBoolean("enabled") == null ? true : remoteConfigJson.getBoolean("enabled"));
+            remoteConfig.setLastVersionCode(remoteConfigJson.getInteger("lastVersionCode"));
+            remoteConfig.setLastVersionName(remoteConfigJson.getString("lastVersionName"));
+            remoteConfig.setVersionEnableConfig(remoteConfigJson.getJSONObject("versionEnableConfig"));
+            remoteConfig.setVersionConfig(remoteConfigJson.getJSONObject("versionConfig"));
+            remoteConfig.setNotice(remoteConfigJson.getString("notice"));
+            List<String> versionList = new ArrayList<>();
+            if (remoteConfigJson != null && StringUtil.isNotEmpty(remoteConfigJson.getString("supportVersion"))) {
+                String[] versionArr = remoteConfigJson.getString("supportVersion").split(",");
+                for (String version : versionArr) {
+                    versionList.add(version.replaceAll(" ", ""));
                 }
-                remoteConfig.setEnabled(remoteConfigJson.getBoolean("enabled") == null ? true : remoteConfigJson.getBoolean("enabled"));
-                remoteConfig.setLastVersionCode(remoteConfigJson.getInteger("lastVersionCode"));
-                remoteConfig.setLastVersionName(remoteConfigJson.getString("lastVersionName"));
-                remoteConfig.setVersionEnableConfig(remoteConfigJson.getJSONObject("versionEnableConfig"));
-                remoteConfig.setVersionConfig(remoteConfigJson.getJSONObject("versionConfig"));
-                remoteConfig.setNotice(remoteConfigJson.getString("notice"));
-                List<String> versionList = new ArrayList<>();
-                if (remoteConfigJson != null && StringUtil.isNotEmpty(remoteConfigJson.getString("supportVersion"))) {
-                    String[] versionArr = remoteConfigJson.getString("supportVersion").split(",");
-                    for (String version : versionArr) {
-                        versionList.add(version.replaceAll(" ", ""));
-                    }
-                }
-                remoteConfig.setVersionList(versionList);
             }
+            remoteConfig.setVersionList(versionList);
             return remoteConfig;
         } catch (Exception e) {
+            LogUtil.log(e);
             return remoteConfig;
         }
     }
+
+    public static JSONObject getRemoteConfigJson() {
+        String configStr = getLocalConfigString("remoteConfig");
+        if (HookUtil.isOnMainThread()) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String configStr = HttpUtil.getPageContent(HookRemoteConfig.remoteConfigUrl);
+                    JSONObject configJson = JSONObject.parseObject(configStr);
+                    putLocalConfig("remoteConfig", configJson);
+                }
+            }).start();
+            if (StringUtil.isEmpty(configStr)) {
+                return new JSONObject();
+            }
+            return JSONObject.parseObject(configStr);
+        } else {
+            configStr = HttpUtil.getPageContent(HookRemoteConfig.remoteConfigUrl);
+            return JSONObject.parseObject(configStr);
+        }
+    }
+
 }

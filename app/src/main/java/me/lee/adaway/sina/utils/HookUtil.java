@@ -171,4 +171,8 @@ public final class HookUtil {
             return null;
         }
     }
+
+    public static boolean isOnMainThread() {
+        return Thread.currentThread() == Looper.getMainLooper().getThread();
+    }
 }

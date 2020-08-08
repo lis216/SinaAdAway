@@ -55,6 +55,11 @@
                     android:layout_height="50dp" android:id="@+id/remove_all_ad" android:paddingLeft="10dp"
                     android:paddingRight="10dp"/>
             <Switch
+                    android:text="@string/hide_follow_recommend"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_follow_recommend" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
                     android:text="@string/hide_top_hongbao"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_top_hongbao" android:paddingLeft="10dp"

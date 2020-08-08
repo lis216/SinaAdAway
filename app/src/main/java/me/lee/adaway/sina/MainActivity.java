@@ -118,6 +118,7 @@ public class MainActivity extends BaseAppCompatActivity implements CompoundButto
                 }
                 break;
             case R.id.remove_all_ad:
+            case R.id.hide_follow_recommend:
             case R.id.hide_top_hongbao:
             case R.id.auto_sign:
             case R.id.hide_hongbao:

@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.1"
 
     defaultConfig {
         applicationId "me.lee.adaway.sina"
         minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 4
-        versionName "0.0.4"
+        targetSdkVersion 30
+        versionCode 5
+        versionName "0.0.5"
         archivesBaseName = "SinaAdAway-Xposed_v${versionName}"
     }
 
