@@ -13,6 +13,7 @@ import me.lee.adaway.sina.utils.LogUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import static me.lee.adaway.sina.utils.HookUtil.showToast;
 
@@ -22,6 +23,7 @@ public class HomePageHook extends BaseHook {
     private Boolean autoSign;
     private Boolean hideHongbao;
     private Boolean autoGetHongbao;
+    private Boolean hideFollowRecommend;
 
     private String signDate = "";
     private boolean close = false;
@@ -32,6 +34,7 @@ public class HomePageHook extends BaseHook {
         autoSign = config.getBoolean(String.valueOf(R.id.auto_sign));
         hideHongbao = config.getBoolean(String.valueOf(R.id.hide_hongbao));
         autoGetHongbao = config.getBoolean(String.valueOf(R.id.auto_get_hongbao));
+        hideFollowRecommend = config.getBoolean(String.valueOf(R.id.hide_follow_recommend));
     }
 
     @Override
@@ -40,6 +43,7 @@ public class HomePageHook extends BaseHook {
         if (hideTopHongbao) hideTopHongbao();
         if (hideHongbao) hideFloatHongbao();
         if (autoGetHongbao) autoGetHongbao();
+        if (hideFollowRecommend) hideFollowRecommend();
     }
 
     private void hideTopHongbao() {
@@ -83,7 +87,7 @@ public class HomePageHook extends BaseHook {
                 }
             });
         } catch (Exception e) {
-            LogUtil.log("");
+            LogUtil.log(e);
         }
 
     }
@@ -108,4 +112,7 @@ public class HomePageHook extends BaseHook {
         });
     }
 
+    private void hideFollowRecommend() {
+        HookUtil.findAndHookMethod("com.sina.weibo.story.photo.StoryFeedComponent", loader, "showStoryList", List.class, replaceNull());
+    }
 }

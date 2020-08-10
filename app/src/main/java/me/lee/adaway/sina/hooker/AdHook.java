@@ -10,7 +10,6 @@ import de.robv.android.xposed.XposedHelpers;
 import me.lee.adaway.sina.R;
 import me.lee.adaway.sina.hooker.base.BaseHook;
 import me.lee.adaway.sina.utils.HookUtil;
-import me.lee.adaway.sina.utils.LogUtil;
 import me.lee.adaway.sina.utils.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,6 +45,7 @@ public class AdHook extends BaseHook {
             hideDetailAd();
             hideCommentAd();
             hideVideoPageAd();
+            hideVideoStardAd();
         }
         if (hideDetailShare) hideDetailShare();
     }
@@ -148,11 +148,10 @@ public class AdHook extends BaseHook {
                                         JSONArray cardGroup = card.getJSONArray("card_group");
                                         JSONArray newCardGroup = new JSONArray();
                                         if (showType == 3 && cardGroup.length() == 2) {
-                                            LogUtil.log(cardGroup.toString());
                                             if (!hideFindPageNav && cardGroup.getJSONObject(0).getInt("card_type") == 19 && !cardGroup.getJSONObject(0).isNull("posid")) {
                                                 newCardGroup.put(cardGroup.getJSONObject(0));
                                             }
-                                            if (!hideFindPageCarousel && cardGroup.getJSONObject(0).getInt("card_type") == 118) {
+                                            if (!hideFindPageCarousel && cardGroup.getJSONObject(1).getInt("card_type") == 118) {
                                                 newCardGroup.put(cardGroup.getJSONObject(1));
                                             }
                                             if (!hideFindPageNav || !hideFindPageCarousel) {
@@ -177,6 +176,7 @@ public class AdHook extends BaseHook {
             });
         } catch (Exception e) {
         }
+
     }
 
     private List removeAd(ArrayList arrayList) {
@@ -394,5 +394,14 @@ public class AdHook extends BaseHook {
 
         }
 
+    }
+
+    private void hideVideoStardAd() {
+        try {
+            
+
+        } catch (Exception e) {
+
+        }
     }
 }
