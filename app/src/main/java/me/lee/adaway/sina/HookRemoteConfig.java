@@ -30,7 +30,7 @@ public class HookRemoteConfig implements Serializable {
             return "最佳适配";
         } else {
             if (versionList == null || versionList.size() == 0) {
-                return "非最佳适配:未获取到已适配版本信息";
+                return "非最佳适配:未获取到适配版本信息";
             } else {
                 if (versionList.contains(versionName)) {
                     return "非最佳适配:请下载对应版本插件";

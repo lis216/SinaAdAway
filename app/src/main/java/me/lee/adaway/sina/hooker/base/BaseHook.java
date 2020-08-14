@@ -83,6 +83,15 @@ public abstract class BaseHook {
         }
     }
 
+    protected Boolean getBoolean(int id) {
+        Boolean value = config.getBoolean(String.valueOf(id));
+        if (value == null) {
+            return false;
+        } else {
+            return value;
+        }
+    }
+
     protected XC_MethodHook replaceNull() {
         return replaceObj(null);
     }

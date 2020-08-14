@@ -26,14 +26,16 @@ public class AdHook extends BaseHook {
     private Boolean hideDetailShare;
     private Boolean hideFindPageCarousel;
     private Boolean hideFindPageNav;
+    private Boolean hideCommentFollowCard;
 
     @Override
     protected void initConfig() {
-        removeAllAd = config.getBoolean(String.valueOf(R.id.remove_all_ad));
-        hideDetailShare = config.getBoolean(String.valueOf(R.id.hide_detail_share));
-        cancelHideContentHot = config.getBoolean(String.valueOf(R.id.cancel_hide_content_hot));
-        hideFindPageCarousel = config.getBoolean(String.valueOf(R.id.hide_find_page_carousel));
-        hideFindPageNav = config.getBoolean(String.valueOf(R.id.hide_find_page_nav));
+        removeAllAd = getBoolean(R.id.remove_all_ad);
+        hideDetailShare = getBoolean(R.id.hide_detail_share);
+        cancelHideContentHot = getBoolean(R.id.cancel_hide_content_hot);
+        hideFindPageCarousel = getBoolean(R.id.hide_find_page_carousel);
+        hideFindPageNav = getBoolean(R.id.hide_find_page_nav);
+        hideCommentFollowCard = getBoolean(R.id.hide_comment_follow_card);
     }
 
     @Override
@@ -45,8 +47,9 @@ public class AdHook extends BaseHook {
             hideDetailAd();
             hideCommentAd();
             hideVideoPageAd();
-            hideVideoStardAd();
+            hideSVSAd();
         }
+        if (hideCommentFollowCard) hideCommentFollowCard();
         if (hideDetailShare) hideDetailShare();
     }
 
@@ -55,6 +58,30 @@ public class AdHook extends BaseHook {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 param.setResult(false);
+            }
+        });
+        HookUtil.findAndHookMethod("com.weibo.mobileads.util.AdUtil", loader, "setAds", List.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                param.args[0] = Collections.EMPTY_LIST;
+            }
+        });
+        HookUtil.findAndHookMethod("com.weibo.mobileads.util.AdUtil", loader, "getAds", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(Collections.EMPTY_LIST);
+            }
+        });
+        HookUtil.findAndHookMethod("com.weibo.mobileads.util.AdUtil", loader, "getFlashAd", Context.class, List.class, String.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(null);
+            }
+        });
+        HookUtil.findAndHookMethod("com.weibo.mobileads.util.AdUtil", loader, "getFlashAdInfo", String.class, Context.class, List.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(null);
             }
         });
     }
@@ -185,6 +212,7 @@ public class AdHook extends BaseHook {
             Iterator it = arrayList.iterator();
             while (it.hasNext()) {
                 Object obj = it.next();
+                String text = (String) XposedHelpers.getObjectField(obj, "text");
                 if (!shouldRemoveStatus(obj)) {
                     list.add(obj);
                 }
@@ -195,6 +223,12 @@ public class AdHook extends BaseHook {
 
     private Boolean shouldRemoveStatus(Object mblog) {
         if (isPromotion(mblog)) return true;
+
+        int mblogtype = XposedHelpers.getIntField(mblog, "mblogtype");
+        if (mblogtype != 0) {
+            return true;
+        }
+
         String text = (String) XposedHelpers.getObjectField(mblog, "text");
         if (StringUtil.isNotEmpty(text)) {
             if (checkText(text, config.getString(String.valueOf(R.id.filter_content_key_word)))) return true;
@@ -214,36 +248,37 @@ public class AdHook extends BaseHook {
     }
 
     private Boolean shouldRemoveCardMblog(JSONObject cardMblog) {
-        try {
-            if (cardMblog == null) return false;
-            if (!cardMblog.isNull("promotion")) {
-                JSONObject promotion = cardMblog.getJSONObject("promotion");
-                String ad_type = promotion.getString("adtype");
-                if (!cancelHideContentHot) {
+        if (cardMblog == null) return false;
+        if (!cardMblog.isNull("promotion")) {
+            JSONObject promotion = cardMblog.optJSONObject("promotion");
+            String ad_type = promotion.optString("adtype");
+            if (!cancelHideContentHot) {
+                return true;
+            } else {
+                if ("8" != ad_type) {
                     return true;
-                } else {
-                    if ("8" != ad_type) {
-                        return true;
-                    }
                 }
             }
-            String text = cardMblog.getString("text");
-            if (StringUtil.isNotEmpty(text)) {
-                if (checkText(text, config.getString(String.valueOf(R.id.filter_content_key_word)))) return true;
-            }
+        }
 
-            JSONObject user = cardMblog.getJSONObject("user");
-            if (user != null) {
-                String name = user.getString("screen_name");
-                if (checkText(name, config.getString(String.valueOf(R.id.filter_user_key_word)))) return true;
-            }
+        if (!cardMblog.isNull("mblogtype") && cardMblog.optInt("mblogtype") != 0) {
+            return true;
+        }
 
-            if (!cardMblog.isNull("retweeted_status")) {
-                JSONObject retweeted = cardMblog.getJSONObject("retweeted_status");
-                if (shouldRemoveCardMblog(retweeted)) return true;
-            }
-        } catch (Exception e) {
+        String text = cardMblog.optString("text");
+        if (StringUtil.isNotEmpty(text)) {
+            if (checkText(text, config.getString(String.valueOf(R.id.filter_content_key_word)))) return true;
+        }
 
+        JSONObject user = cardMblog.optJSONObject("user");
+        if (user != null) {
+            String name = user.optString("screen_name");
+            if (checkText(name, config.getString(String.valueOf(R.id.filter_user_key_word)))) return true;
+        }
+
+        if (!cardMblog.isNull("retweeted_status")) {
+            JSONObject retweeted = cardMblog.optJSONObject("retweeted_status");
+            if (shouldRemoveCardMblog(retweeted)) return true;
         }
         return false;
     }
@@ -378,6 +413,10 @@ public class AdHook extends BaseHook {
         }
     }
 
+    private void hideCommentFollowCard() {
+        HookUtil.findAndHookMethod("com.sina.weibo.feed.list.e", loader, "Y", replaceNull());
+    }
+
     private void hideVideoPageAd() {
         try {
             Class ExpandableBannerView = loader.loadClass("com.sina.weibo.video.detail2.view.ExpandableBannerView");
@@ -396,12 +435,34 @@ public class AdHook extends BaseHook {
 
     }
 
-    private void hideVideoStardAd() {
-        try {
-            
+    private void hideSVSAd() {
+        // 短视频请求地址
+        // tiny_ranklist_home 榜单  // tiny_ranklist_hots 热门  //tiny_stream_video_list推荐
+        HookUtil.findAndHookMethod("com.sina.weibo.story.stream.request.get.SVSRecommendListRequest", loader, "parse", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (param.args[0] != null) {
+                    JSONObject jsonObject = new JSONObject((String) param.args[0]);
+                    JSONArray jsonArray = jsonObject.optJSONArray("statuses");
+                    JSONArray newJsonArray = new JSONArray();
+                    if (jsonArray != null) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject status = jsonArray.optJSONObject(i);
+                            if (status.isNull("ad_state") || status.optInt("ad_state") != 1) {
+                                String text = status.optString("text");
+                                if (StringUtil.isNotEmpty(text)) {
+                                    if (!checkText(text, config.getString(String.valueOf(R.id.filter_content_key_word)))) {
+                                        newJsonArray.put(status);
+                                    }
+                                }
 
-        } catch (Exception e) {
-
-        }
+                            }
+                        }
+                        jsonObject.put("statuses", newJsonArray);
+                    }
+                    param.args[0] = jsonObject.toString();
+                }
+            }
+        });
     }
 }

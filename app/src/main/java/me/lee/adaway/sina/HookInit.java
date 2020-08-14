@@ -25,7 +25,7 @@ public class HookInit implements IXposedHookLoadPackage, IXposedHookInitPackageR
      * @param loader
      */
     private void setModuleActive(ClassLoader loader) {
-        findAndHookMethod(HookConstant.MODULE_PACKAGE_NAME + ".BaseAppCompatActivity", loader, "isModuleActive", new XC_MethodHook() {
+        findAndHookMethod(HookConstant.MODULE_PACKAGE_NAME + ".MainActivity", loader, "isModuleActive", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 param.setResult(true);

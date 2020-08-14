@@ -77,10 +77,14 @@ public final class HookPackage {
     }
 
     private void startAllHook() {
-        HookUtil.showToast("SinaAdAway已加载!");
         HookRemoteConfig remoteConfig = getRemoteConfig();
         if (!remoteConfig.isEnabled() || !remoteConfig.isVersionEnabled()) {
+            HookUtil.showToast("SinaAdAway配置加载失败, 请确保文件读写权限!");
             return;
+        }
+        HookUtil.showToast("SinaAdAway已加载 [" + remoteConfig.isPerfectSupport(HookPackage.getVersionName()) + "]");
+        if (StringUtil.isNotEmpty(remoteConfig.getNotice())) {
+            HookUtil.showToast(remoteConfig.getNotice());
         }
         hooks.clear();
         hooks.add(new AdHook());

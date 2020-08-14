@@ -109,6 +109,11 @@
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
             <Switch
+                    android:text="@string/hide_comment_follow_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_comment_follow_card" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
+            <Switch
                     android:text="@string/hide_detail_share"
                     android:layout_width="match_parent"
                     android:layout_height="50dp" android:id="@+id/hide_detail_share" android:paddingLeft="10dp"
@@ -164,7 +169,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#F2F2F2"/>
-
+            <Switch
+                    android:text="隐藏会员图标"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" android:id="@+id/hide_member_icon" android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
             <Switch
                     android:text="隐藏功能设置"
                     android:layout_width="match_parent"

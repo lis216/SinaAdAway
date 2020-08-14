@@ -20,7 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep public class me.lee.adaway.sina.HookInit
--keep public class me.lee.adaway.sina.BaseAppCompatActivity
--keepclassmembers class me.lee.adaway.sina.BaseAppCompatActivity {
+-keepclassmembers class me.lee.adaway.sina.MainActivity {
     boolean isModuleActive();
 }

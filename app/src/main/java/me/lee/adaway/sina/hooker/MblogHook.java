@@ -10,19 +10,18 @@ public class MblogHook extends BaseHook {
 
     @Override
     protected void initConfig() {
-        hidePersonBackground = config.getBoolean(String.valueOf(R.id.hide_person_background));
-        hidePersonHeadPendant = config.getBoolean(String.valueOf(R.id.hide_person_head_pendant));
+        hidePersonBackground = getBoolean(R.id.hide_person_background);
+        hidePersonHeadPendant = getBoolean(R.id.hide_person_head_pendant);
     }
 
     @Override
     protected void hookMain() {
-        loadConfig();
         if (hidePersonHeadPendant) hidePersonHeadPendant();
         if (hidePersonBackground) hidePersonBackground();
     }
 
     private void hidePersonHeadPendant() {
-        
+
     }
 
     private void hidePersonBackground() {

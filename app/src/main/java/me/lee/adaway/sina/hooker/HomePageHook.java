@@ -30,11 +30,11 @@ public class HomePageHook extends BaseHook {
 
     @Override
     protected void initConfig() {
-        hideTopHongbao = config.getBoolean(String.valueOf(R.id.hide_top_hongbao));
-        autoSign = config.getBoolean(String.valueOf(R.id.auto_sign));
-        hideHongbao = config.getBoolean(String.valueOf(R.id.hide_hongbao));
-        autoGetHongbao = config.getBoolean(String.valueOf(R.id.auto_get_hongbao));
-        hideFollowRecommend = config.getBoolean(String.valueOf(R.id.hide_follow_recommend));
+        hideTopHongbao = getBoolean(R.id.hide_top_hongbao);
+        autoSign = getBoolean(R.id.auto_sign);
+        hideHongbao = getBoolean(R.id.hide_hongbao);
+        autoGetHongbao = getBoolean(R.id.auto_get_hongbao);
+        hideFollowRecommend = getBoolean(R.id.hide_follow_recommend);
     }
 
     @Override
@@ -48,8 +48,9 @@ public class HomePageHook extends BaseHook {
 
     private void hideTopHongbao() {
         try {
+            // 搜反编译 /* compiled from: FeedRedPacketCommonStrategy */
             Class FeedRedPacket = loader.loadClass("com.sina.weibo.models.FeedRedPacket");
-            HookUtil.findAndHookMethod("com.sina.weibo.utils.bx", loader, "a", Context.class, ViewGroup.class, FeedRedPacket, new XC_MethodHook() {
+            HookUtil.findAndHookMethod("com.sina.weibo.utils.bw", loader, "a", Context.class, ViewGroup.class, FeedRedPacket, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);

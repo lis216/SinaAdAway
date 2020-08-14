@@ -19,6 +19,7 @@
     <string name="cancel_hide_content_hot">取消屏蔽时间线热门</string>
     <string name="filter_content_key_word">屏蔽的内容关键词(,隔开)</string>
     <string name="filter_user_key_word">屏蔽的用户关键词(,隔开)</string>
-    <string name="hide_detail_share">隐藏微博详情底部分享面板</string>
+    <string name="hide_detail_share">隐藏微博详情分享面板</string>
+    <string name="hide_comment_follow_card">隐藏评论区关注面板</string>
 
 </resources>
