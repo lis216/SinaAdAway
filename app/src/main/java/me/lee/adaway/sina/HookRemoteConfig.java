@@ -30,12 +30,17 @@ public class HookRemoteConfig implements Serializable {
             return "最佳适配";
         } else {
             if (versionList == null || versionList.size() == 0) {
-                return "非最佳适配:未获取到适配版本信息";
+                return "未获取到适配版本信息";
             } else {
                 if (versionList.contains(versionName)) {
-                    return "非最佳适配:请下载对应版本插件";
+                    if (!versionName.equals(lastVersionName)) {
+                        return "非最佳适配 点击下载新版:" + getLastVersionName();
+                    } else {
+                        return "非最佳适配, 请下载对应版本插件!";
+                    }
+
                 } else {
-                    return "非最佳适配:请等待作者适配";
+                    return "未适配";
                 }
             }
 
@@ -47,10 +52,7 @@ public class HookRemoteConfig implements Serializable {
     }
 
     public boolean isVersionEnabled() {
-        if (versionEnableConfig == null) {
-            return true;
-        }
-        if (versionEnableConfig.get(String.valueOf(BuildConfig.VERSION_CODE)) != null) {
+        if (versionEnableConfig != null && versionEnableConfig.get(String.valueOf(BuildConfig.VERSION_CODE)) != null) {
             return versionEnableConfig.getBoolean(String.valueOf(BuildConfig.VERSION_CODE));
         } else {
             return false;

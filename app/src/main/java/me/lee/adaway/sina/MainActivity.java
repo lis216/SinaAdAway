@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 case R.id.filter_user_key_word:
                     inputTitleDialog("输入关键词", "用户名含关键词的微博将被过滤", R.id.filter_user_key_word);
                     break;
-                case R.id.download_apk:
+                case R.id.tip_0:
                     ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     // 将文本内容放到系统剪贴板里。
                     cm.setText("6666");
@@ -188,11 +188,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.auto_get_hongbao:
             case R.id.hide_detail_share:
             case R.id.hide_comment_follow_card:
+            case R.id.hide_hot_search_shopping:
             case R.id.hide_find_page_nav:
             case R.id.hide_find_page_carousel:
             case R.id.cancel_hide_content_hot:
-            case R.id.hide_person_head_pendant:
-            case R.id.hide_person_background:
+            case R.id.hide_mblog_ad:
+            case R.id.hide_mblog_background:
+            case R.id.hide_mblog_head_pendant:
+            case R.id.hide_mblog_buttons:
             case R.id.hide_setting:
             case R.id.hide_visit:
             case R.id.hide_chaohua:
@@ -202,6 +205,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.hide_draft:
             case R.id.cancel_hide_sport:
             case R.id.hide_member_icon:
+            case R.id.hide_safety:
+            case R.id.hide_hongbaook:
+            case R.id.hide_recommend:
                 break;
             default:
                 if (b) {
@@ -369,8 +375,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for (int index = 0; index < grantResults.length; index++) {
-            if (PackageManager.PERMISSION_DENIED == grantResults[index])
+            if (PackageManager.PERMISSION_DENIED == grantResults[index]) {
                 finish();
+            } else {
+                HookPackage.getRemoteConfig();
+            }
+
         }
     }
 
@@ -422,9 +432,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             userKeyWord.setText(cacheUserWords);
         }
 
-        Button downloadBtn = findViewById(R.id.download_apk);
-        downloadBtn.setOnClickListener(new MyOnClickListener());
         TextView tips = findViewById(R.id.tip_0);
+        tips.setOnClickListener(new MyOnClickListener());
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -433,8 +442,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     @Override
                     public void run() {
                         try {
-                            String tip = "下载(当前:" + BuildConfig.VERSION_NAME + "  最新: " + remoteConfig.getLastVersionName() + ")";
-                            downloadBtn.setText(tip);
                             String versionName = getPackageManager().getPackageInfo(HookConstant.HOOK_PACKAGE_NAME, 0).versionName;
                             String text = "版本: " + versionName + " - " + BuildConfig.VERSION_NAME + "(" + remoteConfig.isPerfectSupport(versionName) + ")";
                             tips.setText(text);

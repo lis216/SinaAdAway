@@ -44,6 +44,7 @@ public class HomePageHook extends BaseHook {
         if (hideHongbao) hideFloatHongbao();
         if (autoGetHongbao) autoGetHongbao();
         if (hideFollowRecommend) hideFollowRecommend();
+        hideCheckinView();
     }
 
     private void hideTopHongbao() {
@@ -115,5 +116,33 @@ public class HomePageHook extends BaseHook {
 
     private void hideFollowRecommend() {
         HookUtil.findAndHookMethod("com.sina.weibo.story.photo.StoryFeedComponent", loader, "showStoryList", List.class, replaceNull());
+    }
+
+    private void hideCheckinView() {
+        
+//        HookUtil.findAndHookMethod("com.sina.weibo.feed.home.header.checkin.view.FeedCheckInView", loader, "a", Context.class, new XC_MethodHook() {
+//            @Override
+//            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                super.afterHookedMethod(param);
+//                LinearLayout view = getObject(param.thisObject, LinearLayout.class, "f");
+//                view.callOnClick();
+//                //showToast("签到");
+//                view.setVisibility(View.VISIBLE);
+//            }
+//        });
+
+//        HookUtil.findAndHookMethod("com.sina.weibo.feed.home.biz.e$a", loader, "a", String[].class, new XC_MethodHook() {
+//            @Override
+//            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                super.afterHookedMethod(param);
+//                showToast("签到了");
+//                String[] arr = (String[]) param.args[0];
+//                for (int i = 0; i < arr.length; i++) {
+//                    LogUtil.log("签到入参:" + arr[i]);
+//                }
+//
+//            }
+//        });
+
     }
 }

@@ -16,6 +16,7 @@
     <string name="auto_sign">自动签到</string>
     <string name="hide_hongbao">隐藏首页红包浮窗</string>
     <string name="auto_get_hongbao">自动领取浮窗红包</string>
+    <string name="hide_mblog_ad">屏蔽时间线广告</string>
     <string name="cancel_hide_content_hot">取消屏蔽时间线热门</string>
     <string name="filter_content_key_word">屏蔽的内容关键词(,隔开)</string>
     <string name="filter_user_key_word">屏蔽的用户关键词(,隔开)</string>

@@ -1,11 +1,18 @@
 package me.lee.adaway.sina.hooker;
 
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedHelpers;
+import me.lee.adaway.sina.MainActivity;
 import me.lee.adaway.sina.R;
+import me.lee.adaway.sina.constant.HookConstant;
 import me.lee.adaway.sina.hooker.base.BaseHook;
 import me.lee.adaway.sina.utils.HookUtil;
-import me.lee.adaway.sina.utils.LogUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,6 +27,9 @@ public class UserCenterHook extends BaseHook {
     private Boolean hideDraft;
     private Boolean cancelHideSport;
     private Boolean hideMemberIcon;
+    private Boolean hideSafety;
+    private Boolean hideHongbaook;
+    private Boolean hideRecommend;
 
     @Override
     protected void initConfig() {
@@ -32,6 +42,9 @@ public class UserCenterHook extends BaseHook {
         hideDraft = getBoolean(R.id.hide_draft);
         cancelHideSport = getBoolean(R.id.cancel_hide_sport);
         hideMemberIcon = getBoolean(R.id.hide_member_icon);
+        hideSafety = getBoolean(R.id.hide_safety);
+        hideHongbaook = getBoolean(R.id.hide_hongbaook);
+        hideRecommend = getBoolean(R.id.hide_recommend);
     }
 
     @Override
@@ -43,7 +56,6 @@ public class UserCenterHook extends BaseHook {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
                     JSONObject card = (JSONObject) param.args[0];
-                    LogUtil.log(card.toString());
                     boolean hide = false;
                     if (!card.isNull("card_type") && card.getInt("card_type") == 11) {
                         if (!card.isNull("card_group")) {
@@ -75,16 +87,15 @@ public class UserCenterHook extends BaseHook {
                                     if (hideDraft) hide = true;
                                     break;
                                 case "100505_-_draft":
-                                    if (cancelHideSport) {
-
-                                        JSONArray newCardGroup = new JSONArray();
-                                        JSONArray cardGroup = card.getJSONArray("card_group");
+                                    JSONArray newCardGroup = new JSONArray();
+                                    JSONArray cardGroup = card.getJSONArray("card_group");
 //                                        for (int j = 0; j < cardGroup.length(); j++) {
 //                                            JSONObject cardTemp = cardGroup.getJSONObject(j);
 //                                            if ("100505_-_sport".equals(cardTemp.getString("cardid"))) {
 //                                                newCardGroup.put(cardTemp);
 //                                            }
 //                                        }
+                                    if (cancelHideSport) {
                                         String sport = "{\n" +
                                                 "\"card_type\": 4 ,\n" +
                                                 "\"itemid\": \"100505_-_sport\" ,\n" +
@@ -106,10 +117,40 @@ public class UserCenterHook extends BaseHook {
                                                 "},\n" +
                                                 "\"openurl\": \"\"\n" +
                                                 "}";
-                                        JSONObject cardTemp = new JSONObject(sport);
-                                        newCardGroup.put(cardTemp);
-                                        card.put("card_group", newCardGroup);
-                                    } else {
+                                        JSONObject sportCard = new JSONObject(sport);
+                                        newCardGroup.put(sportCard);
+                                    }
+                                    //添加模块入口
+                                    String setting = "{\n" +
+                                            "\"card_type\": 4 ,\n" +
+                                            "\"itemid\": \"100505_-_SinaAdAway\" ,\n" +
+                                            "\"cardid\": \"100505_-_SinaAdAway\" ,\n" +
+                                            "\"display_arrow\": 1 ,\n" +
+                                            "\"bold\": 1 ,\n" +
+                                            "\"title\": \"个性化设置\" ,\n" +
+                                            "\"desc\": \"个性化设置\" ,\n" +
+                                            "\"desc_extr\": \"SinaAdAway模块设置\" ,\n" +
+                                            "\"card_type_name\": \"个性化设置\" ,\n" +
+                                            "\"pic\": \"https://h5.sinaimg.cn/upload/1008/253/2018/08/07/compose_built_compose_icon_qa.png\" ,\n" +
+                                            "\"openurl\": \"\"\n" +
+                                            "}";
+
+                                    JSONObject settingCard = new JSONObject(setting);
+                                    newCardGroup.put(settingCard);
+                                    card.put("card_group", newCardGroup);
+                                    break;
+                                case "100505_-_safety":
+                                    if (hideSafety) {
+                                        hide = true;
+                                    }
+                                    break;
+                                case "100505_-_hongbaook":
+                                    if (hideHongbaook) {
+                                        hide = true;
+                                    }
+                                    break;
+                                case "1005051004":
+                                    if (hideRecommend) {
                                         hide = true;
                                     }
                                     break;
@@ -131,6 +172,25 @@ public class UserCenterHook extends BaseHook {
                     }
                 });
             }
+            Class UserInfoActivity = loader.loadClass("com.sina.weibo.page.UserInfoActivity");
+            //添加事件
+            HookUtil.findAndHookMethod("com.sina.weibo.page.UserInfoActivity$5", loader, "onItemClick", AdapterView.class, View.class, int.class, long.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Activity activity = getObject(param.thisObject, UserInfoActivity, "b");
+                    Object view = param.args[1];
+                    Object pageCardInfo = XposedHelpers.getObjectField(view, "h");
+                    String itemid = (String) XposedHelpers.getObjectField(pageCardInfo, "itemid");
+                    if ("100505_-_SinaAdAway".equals(itemid)) {
+                        Intent intent = new Intent(HookConstant.MODULE_PACKAGE_NAME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setComponent(new ComponentName(HookConstant.MODULE_PACKAGE_NAME, MainActivity.class.getName()));
+                        activity.startActivity(intent);
+                    }
+                }
+            });
+
 
         } catch (Exception e) {
 

@@ -1,14 +1,10 @@
 package me.lee.adaway.sina;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import me.lee.adaway.sina.constant.HookConstant;
-import me.lee.adaway.sina.hooker.AdHook;
-import me.lee.adaway.sina.hooker.HomePageHook;
-import me.lee.adaway.sina.hooker.MblogHook;
-import me.lee.adaway.sina.hooker.UserCenterHook;
+import me.lee.adaway.sina.hooker.*;
 import me.lee.adaway.sina.hooker.base.BaseHook;
 import me.lee.adaway.sina.utils.*;
 
@@ -54,7 +50,6 @@ public final class HookPackage {
         HookRemoteConfig config = remoteConfig.get();
         if (config == null) {
             config = loadRemoteConfig();
-            LogUtil.log("拉取远程配置:" + JSON.toJSONString(config));
             remoteConfig = new WeakReference<>(config);
         }
         return config;
@@ -87,9 +82,10 @@ public final class HookPackage {
             HookUtil.showToast(remoteConfig.getNotice());
         }
         hooks.clear();
-        hooks.add(new AdHook());
+        hooks.add(new CommonAdHook());
         hooks.add(new HomePageHook());
         hooks.add(new MblogHook());
+        hooks.add(new FindPageHook());
         hooks.add(new UserCenterHook());
         for (BaseHook hook : hooks) {
             hook.startHook();

@@ -175,4 +175,20 @@ public final class HookUtil {
     public static boolean isOnMainThread() {
         return Thread.currentThread() == Looper.getMainLooper().getThread();
     }
+
+    public static Boolean checkText(String str, String keyWords) {
+        if (StringUtil.isEmpty(keyWords)) {
+            return false;
+        }
+        String[] keyArr = keyWords.split(",");
+        if (keyArr.length <= 0) {
+            return false;
+        }
+        for (String strTemp : keyArr) {
+            if (str.indexOf(strTemp) != -1) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
